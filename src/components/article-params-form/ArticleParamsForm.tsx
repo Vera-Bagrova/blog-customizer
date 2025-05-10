@@ -6,7 +6,7 @@ import { Separator } from 'src/ui/separator';
 import { Text } from 'src/ui/text';
 import { useDisclosure } from 'src/hooks/useDisclosure';
 import { FormEvent, useRef, useState } from 'react';
-import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
+import { useOutsideClickClose } from 'src/hooks/useOutsideClickClose';
 import {
 	ArticleStateType,
 	defaultArticleState,
@@ -21,19 +21,23 @@ import clsx from 'clsx';
 import styles from './ArticleParamsForm.module.scss';
 
 type articleParamsProps = {
+	articleParams: ArticleStateType;
 	setArticleParams: (props: ArticleStateType) => void;
 };
 
-export const ArticleParamsForm = ({ setArticleParams }: articleParamsProps) => {
-	const { isFormOpen, toogle } = useDisclosure(false);
-	const [params, setParams] = useState(defaultArticleState);
-	const ref = useRef<HTMLDivElement | null>(null);
+export const ArticleParamsForm = ({
+	articleParams,
+	setArticleParams,
+}: articleParamsProps) => {
+	const { isFormOpen, toogle, close } = useDisclosure(false);
+	const [params, setParams] = useState(articleParams);
+	const sidebarRef = useRef<HTMLDivElement | null>(null);
 
 	// Обработчик клика вне сайдбара
 	useOutsideClickClose({
 		isOpen: isFormOpen,
-		onChange: toogle,
-		rootRef: ref,
+		onClose: close,
+		rootRef: sidebarRef,
 	});
 
 	// Применяем стили к статье
@@ -52,11 +56,14 @@ export const ArticleParamsForm = ({ setArticleParams }: articleParamsProps) => {
 		<>
 			<ArrowButton isOpen={isFormOpen} onClick={toogle} />
 			<aside
-				ref={ref}
+				ref={sidebarRef}
 				className={clsx(styles.container, {
 					[styles.container_open]: isFormOpen,
 				})}>
-				<form className={styles.form} onSubmit={handleSubmit}>
+				<form
+					className={styles.form}
+					onSubmit={handleSubmit}
+					onReset={handleReset}>
 					<Text as='h2' size={31} weight={800} uppercase>
 						{'Задайте параметры'}
 					</Text>
@@ -103,12 +110,7 @@ export const ArticleParamsForm = ({ setArticleParams }: articleParamsProps) => {
 						title='ширина контента'
 					/>
 					<div className={styles.bottomContainer}>
-						<Button
-							title='Сбросить'
-							htmlType='reset'
-							type='clear'
-							onClick={handleReset}
-						/>
+						<Button title='Сбросить' htmlType='reset' type='clear' />
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>

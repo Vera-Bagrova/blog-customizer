@@ -29,5 +29,5 @@ export const useDisclosure = (
 		isFormOpen ? close() : open();
 	};
 
-	return { isFormOpen, toogle };
+	return { isFormOpen, toogle, close };
 };
